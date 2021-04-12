@@ -14,9 +14,13 @@
 6. User is redirected to homepage with a thank you message.
 
 ## Wire Frames
-![landing](./docs/landing.png)
+<img src="./docs/landing.png" alt="landing page" width="60%"/>
+<img src="./docs/question.png" alt="question page" width="60%"/>
 
-![question](./docs/question.png)
+## Planning documentation
+### Api documentation
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/mo-ccc/sql-query-test-application/master/docs/swagger.yml
 
-
+### Scrumban board
+https://trello.com/b/MnSlqP47/sql-query-test-application
 
