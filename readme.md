@@ -13,5 +13,10 @@
 5. User submits query. The query the user submitted is saved along with the time the user submitted the query and the result (either 0 or 1).
 6. User is redirected to homepage with a thank you message.
 
+## Wire Frames
+![landing](./docs/landing.png)
+
+![question](./docs/question.png)
+
 
 

@@ -1,0 +1,200 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Swagger for sql test application"
+basePath: "/"
+tags:
+- name: "user"
+- name: "test"
+- name: "question"
+schemes:
+- "https"
+- "http"
+paths:
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Add a new user"
+      description: ""
+      operationId: "addPet"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User"
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Ok"
+          
+  /user/{userId}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by id"
+      description: "Returns a single user"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "ID of user to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              tests:
+                type: array
+                items:
+                  type: "integer"
+                example:
+                  [66, 77, 88]
+                    
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "User not found"
+          
+  /test/{testID}:
+    get:
+      tags:
+      - "test"
+      summary: "get test by id"
+      description: "Returns a test + questions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "testID"
+        in: "path"
+        description: "id of test"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              time_started:
+                type: string
+              time_submitted:
+                type: string
+              user_submitted_query:
+                type: string
+              result:
+                type: integer
+              questions:
+                type: array
+                items:
+                  type: integer
+                  
+  /test/{testID}/execute/:
+    post:
+      tags:
+      - "test"
+      summary: "executes query on db"
+      description: "executes query on db"
+      parameters:
+      - name: "testID"
+        in: "path"
+        description: "id of test"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "User"
+        required: true
+        schema:
+          type: object
+          properties:
+            query:
+              type: string
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              matches:
+                type: boolean
+              result_set:
+                type: array
+                items:
+                  type: object
+                
+  /test/{testID}/submit/:
+    post:
+      tags:
+      - "test"
+      summary: "submit test for marking"
+      description: "submits test for marking"
+      parameters:
+      - name: "testID"
+        in: "path"
+        description: "id of test"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "User"
+        required: true
+        schema:
+          type: object
+          properties:
+            query:
+              type: string
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              submitted_query:
+                type: string
+    
+  /question/{questionID}/:
+    get:
+      tags:
+      - "question"
+      summary: "get question details"
+      description: "get question details"
+      parameters:
+      - name: "questionID"
+        in: "path"
+        description: "id of question"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              prompt:
+                type: string
