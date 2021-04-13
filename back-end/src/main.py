@@ -10,12 +10,16 @@ migrate = flask_migrate.Migrate()
 import flask_cors
 cors = flask_cors.CORS()
 
+import flask_marshmallow
+ma = flask_marshmallow.Marshmallow()
+
 def create_app():
     app = flask.Flask(__name__)
     app.config.from_object('default_settings.configuration')
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app)
+    ma.init_app(app)
 
     from controllers import blueprints
     for blueprint in blueprints:

@@ -1,9 +1,15 @@
 import flask
+from main import db
+
 from models.User import User
 from models.Test import Test
 from models.Question import Question
+
+from validation_schemas.UserSchema import UserSchema
+from validation_schemas.TestSchema import TestSchema
+from validation_schemas.QuestionSchema import QuestionSchema
+
 import random
-from main import db
 
 users = flask.Blueprint('users', __name__)
 
@@ -29,4 +35,6 @@ def register():
     db.session.add(test)
     db.session.commit()
 
-    return flask.jsonify([user.__dict__, test.__dict__, random_question.__dict__])
+    output = UserSchema().dump(user)
+    output["tests"] = TestSchema(exclude=("question",)).dump(test)
+    return flask.jsonify(output)

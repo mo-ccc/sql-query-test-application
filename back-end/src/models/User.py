@@ -7,3 +7,5 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(60), nullable=False, unique=True)
+
+    tests = db.relationship('Test', backref='user', passive_deletes='all')
