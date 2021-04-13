@@ -13,6 +13,13 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from controllers import blueprints
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
+
+    from commands import db_custom
+    app.register_blueprint(db_custom)
+
     @app.errorhandler(Exception)
     def handle_error(e):
         code = 500

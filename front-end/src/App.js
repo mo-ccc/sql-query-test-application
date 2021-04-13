@@ -1,9 +1,12 @@
 import { Switch, Route } from 'react-router-dom'
 import FormBase from './components/FormBase'
+import axios from 'axios'
 
 const App = () => {
   const onSubmit = (data) => {
-    console.log(data)
+    axios.post('http://localhost:5000/user', data)
+    .then(response => console.log(response))
+    .catch(error => console.log(error))
   }
 
   const loginFields = [

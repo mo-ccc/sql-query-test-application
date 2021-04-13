@@ -3,9 +3,6 @@
 ![main_db](./docs/dbdiagram.png)
 
 ## Plan
-- Have a main database which will contain all user data.
-- Have a question database that will handle testing specifically.
-
 1. When a user enters an email, main database is updated with a new `user` record and a new `test` record.
 2. The test becomes accessible through the client as long as `test` record exists and has not been submitted.
 3. User enters a query and presses execute causing `answer_as_query` to run on the question database alongside the user entered query. 
