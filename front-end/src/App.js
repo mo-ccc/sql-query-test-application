@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const App = () => {
   const onSubmit = (data) => {
-    axios.post('http://localhost:5000/user', data)
+    axios.post(`${process.env.REACT_APP_HOST}/user`, data)
     .then(response => console.log(response))
     .catch(error => console.log(error))
   }

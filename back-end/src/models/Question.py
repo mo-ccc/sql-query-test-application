@@ -2,7 +2,7 @@ import flask
 from main import db
 
 
-class Question():
+class Question(db.Model):
     __tablename__ = "questions"
 
     id = db.Column(db.Integer, primary_key=True)
