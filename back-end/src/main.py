@@ -28,11 +28,12 @@ def create_app():
     from commands import db_custom
     app.register_blueprint(db_custom)
 
-    @app.errorhandler(Exception)
-    def handle_error(e):
-        code = 500
-        if isinstance(e, HTTPException):
-            code = e.code
-        return flask.jsonify(error=str(e)), code
+    # @app.errorhandler(Exception)
+    # def handle_error(e):
+    #     print(e)
+    #     code = 500
+    #     if isinstance(e, HTTPException):
+    #         code = e.code
+    #     return flask.jsonify(error=str(e)), code
 
     return app

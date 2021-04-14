@@ -19,8 +19,8 @@ def register():
     user = User.query.filter(User.email==flask.request.json["email"]).first()
     # other wise create the user
     if not user:
-        user = User()
-        user.email = UserSchema(only=("email")).load(flask.request.json)
+        json_data = UserSchema(only=("email",)).load(flask.request.json)
+        user = User(**json_data)
         db.session.add(user)
         db.session.commit()
 
