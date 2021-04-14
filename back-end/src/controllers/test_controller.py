@@ -22,9 +22,12 @@ def detail_get_test(test_id):
 @tests.route('/test/<test_id>/execute', methods=["POST"])
 def execute_query_on_db(test_id):
     try:
+        # retrieves the query_as_answer to run alongside user submitted
         question_answer = Test.query.get(test_id).question.answer_as_query
-        result = {}
+        # initialize an output dict
+        result = {} 
 
+        
         conn = psycopg2.connect(
             host=os.getenv("HOST"), 
             dbname=flask.current_app.config["SQLALCHEMY_DATABASE_URI"].split("/")[-1],
@@ -32,25 +35,26 @@ def execute_query_on_db(test_id):
             port=os.getenv("PORT")
         )
 
+        # returns the result set
         with conn.cursor(cursor_factory=RealDictCursor) as curs:
             curs.execute("""SET search_path TO secondary_schema;""")
             curs.execute(flask.request.json["query"])
             result["result_set"] = json.dumps(curs.fetchall(), default=myconverter)
         
+        # runs the query_as_answer and compares results with user submitted
         with conn.cursor(cursor_factory=RealDictCursor) as curs:
             curs.execute("""SET search_path TO secondary_schema;""")
             curs.execute(question_answer)
             result2 = json.dumps(curs.fetchall(), default=myconverter)
             
             if result["result_set"] == result2:
-                result["matches"] = True
+                result["matches"] = True # if they match, matches is set to true
             else:
                 result["matches"] = False
         return flask.jsonify(result)
 
     except Exception as e:
-        print(e)
-    return 'null'
+        return flask.jsonify({"error": str(e)})
 
 
 @tests.route('/test/<test_id>/submit', methods=["POST"])
