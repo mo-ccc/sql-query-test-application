@@ -19,17 +19,17 @@ class Config():
 
 class Development(Config):
     DEBUG = True
-    if os.getenv("DB_URI"):
-        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('DB_URI')}/developmentdb"
+    if os.getenv("DEVELOPMENT_DB_URI"):
+        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('DEVELOPMENT_DB_URI')}"
 
 class Testing(Config):
     TESTING = True
-    if os.getenv("DB_URI"):
-        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('DB_URI')}/testingdb" # a separate database for tests only
+    if os.getenv("TESTING_DB_URI"):
+        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('TESTING_DB_URI')}/testingdb" # a separate database for tests only
 
 class Production(Config):
-    if os.getenv("DB_URI"):
-        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('DB_URI')}/productiondb"
+    if os.getenv("PRODUCTION_DB_URI"):
+        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('PRODUCTION_DB_URI')}/productiondb"
 
 environment = get_from_env('FLASK_ENV')
 
