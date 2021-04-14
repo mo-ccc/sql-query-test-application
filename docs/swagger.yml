@@ -6,7 +6,6 @@ basePath: "/"
 tags:
 - name: "user"
 - name: "test"
-- name: "question"
 schemes:
 - "https"
 - "http"
@@ -47,46 +46,10 @@ paths:
               tests:
                 type: array
                 items:
-                  type: "integer"
-                example:
-                  [66, 77, 88]
-          
-  /user/{userId}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by id"
-      description: "Returns a single user"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "userId"
-        in: "path"
-        description: "ID of user to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            type: object
-            properties:
-              id:
-                type: integer
-              email:
-                type: string
-              tests:
-                type: array
-                items:
-                  type: "integer"
-                example:
-                  [66, 77, 88]
-                    
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "User not found"
+                  type: object
+                  properties:
+                    id:
+                      type: integer
           
   /test/{testID}:
     get:
@@ -119,10 +82,13 @@ paths:
                 type: string
               result:
                 type: integer
-              questions:
-                type: array
-                items:
-                  type: integer
+              question:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  prompt:
+                    type: string
                   
   /test/{testID}/execute/:
     post:
@@ -187,27 +153,21 @@ paths:
           schema:
             type: object
             properties:
-              submitted_query:
+              id:
+                type: integer
+              time_started:
                 type: string
+              time_submitted:
+                type: string
+              user_submitted_query:
+                type: string
+              result:
+                type: integer
+              question:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  prompt:
+                    type: string
     
-  /question/{questionID}/:
-    get:
-      tags:
-      - "question"
-      summary: "get question details"
-      description: "get question details"
-      parameters:
-      - name: "questionID"
-        in: "path"
-        description: "id of question"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            type: object
-            properties:
-              prompt:
-                type: string
