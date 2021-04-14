@@ -4,6 +4,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios'
+import TableBase from '../components/TableBase.js'
 
 const TestPage = () => {
   let externalState = useLocation().state
@@ -42,6 +43,9 @@ const TestPage = () => {
         <Col xs={12} md={6}>
           <img src="https://vtb-league.com/app/plugins/photonic/include/images/placeholder.png" width="100%"/>
         </Col>
+      </Row>
+      <Row>
+        <TableBase data={responseState?.result_set} />
       </Row>
       
     </div>
