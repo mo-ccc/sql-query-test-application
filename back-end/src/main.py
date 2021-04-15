@@ -17,7 +17,7 @@ def create_app():
     app = flask.Flask(__name__)
     app.config.from_object('default_settings.configuration')
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, include_schemas=True)
     cors.init_app(app)
     ma.init_app(app)
 
