@@ -16,6 +16,17 @@ conn_args = {
 
 db_custom = flask.Blueprint('db_custom', __name__)
 
+@db_custom.cli.command('initialize_schema')
+def initialize_schema():
+    import psycopg2
+    with psycopg2.connect(**conn_args) as conn:
+        conn.autocommit = True
+        with conn.cursor() as curs:
+            curs.execute("""DROP SCHEMA IF EXISTS private;""")
+            curs.execute("""CREATE SCHEMA IF NOT EXISTS private;""")
+    print("schema_initialized")
+
+
 @db_custom.cli.command('initialize_db')
 def initialize_db():
     import psycopg2
@@ -26,12 +37,7 @@ def initialize_db():
         with conn.cursor() as curs: # initialize a cursor
             curs.execute(f"""DROP DATABASE IF EXISTS {os.getenv("DB_NAME")};""")
             curs.execute(f"""CREATE DATABASE {os.getenv("DB_NAME")};""")
-    
-    with psycopg2.connect(**conn_args) as conn:
-        conn.autocommit = True
-        with conn.cursor() as curs:
-            curs.execute("""DROP SCHEMA IF EXISTS private;""")
-            curs.execute("""CREATE SCHEMA IF NOT EXISTS private;""")
+    initialize_schema()
     print("db initialized")
     
 

@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  ## postgres database
+  postgres:
+    container_name: postgres_database
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sqltester
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - type: volume
+        source: flask_postgres_data
+        target: /var/lib/postgres/data
+    networks:
+      - flask_app_network
+  ## flask api
+  flask_app:
+    container_name: flask_app
+    build: ./back-end
+    env_file: ./back-end/src/.env.example
+    ports:
+      - "5000:5000"
+    networks:
+      - flask_app_network
+    volumes:
+      - type: bind
+        source: ./back-end/src # only going to be bind mounting the code
+        target: /code
+    command: flask run -h 0.0.0.0
+    depends_on:
+      - database
+      - pre-setup
+  ## pre-setup
+  pre-setup:
+    build: ./back-end
+    env_file: ./back-end/src/.env.example
+    networks:
+      - flask_app_network
+    command:
+      - /bin/bash
+      - -c
+      - |
+        echo "running pre-setup"
+        flask db upgrade
+        flask db_custom seed_question
+        flask db_custom seed_secondary_tables
+    depends_on:
+      - database
+## volumes
+volumes:
+  flask_postgres_data:
+    name: flask_postgres_data
+## networks
+networks:
+  flask_app_network:
+    name: flask_app_network
+    driver: bridge
+        
