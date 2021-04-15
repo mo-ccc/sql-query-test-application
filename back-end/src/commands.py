@@ -68,9 +68,16 @@ def seed_secondary_tables():
             curs.execute("""CREATE SCHEMA IF NOT EXISTS secondary_schema;""")
             curs.execute("""SET search_path TO secondary_schema;""")
             print("created secondary_schema")
+            conn.commit()
 
-            curs.execute(f"""REVOKE CONNECT ON DATABASE {os.getenv("DB_NAME")} FROM interactor""")
-            curs.execute("""DROP ROLE IF EXISTS interactor;""")
+            try:
+                curs.execute(f"""REVOKE CONNECT ON DATABASE {os.getenv("DB_NAME")} FROM interactor;""")
+                curs.execute("""DROP ROLE interactor;""")
+            except:
+                print("interactor role does not exist. will be created")
+                curs.execute("""ROLLBACK;""")
+                conn.commit()
+        
             curs.execute("""CREATE ROLE interactor LOGIN;""")
             curs.execute(f"""ALTER ROLE interactor WITH PASSWORD '{os.getenv("PASSWORD")}'""")
             curs.execute(f"""GRANT CONNECT ON DATABASE {os.getenv("DB_NAME")} TO interactor""")

@@ -20,7 +20,7 @@ const LandingPage = () => {
   return (
   <div className="container">
     <div className="d-flex justify-content-center align-items-center mt-5">
-      <div className="w-50">
+      <div style={{maxWidth: 800}}>
         <FormBase fields={loginFields} onSubmit={onSubmit}/>
       </div>
     </div>

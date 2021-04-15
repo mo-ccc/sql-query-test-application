@@ -1,0 +1,6 @@
+USERNAME=postgres
+PASSWORD=postgres
+HOST=postgres
+PORT=5432
+DB_NAME=sqltester
+DB_URI=postgres:postgres@postgres:5432/sqltester
