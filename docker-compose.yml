@@ -52,6 +52,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  ## front-end
+  react-app:
+    container_name: react_app
+    
+    build: 
+      context: ./front-end
+      args:
+        - REACT_APP_HOST=http://localhost:5000
+    ports:
+      - "9090:80"
+    networks:
+      - flask_app_network
+    
 ## volumes
 volumes:
   flask_postgres_data:
