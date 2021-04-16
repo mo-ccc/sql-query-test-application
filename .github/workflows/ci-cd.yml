@@ -41,3 +41,62 @@ jobs:
           FLASK_ENV: testing
           DB_URI: postgres:postgres@localhost:5432/testdb
           HOSTNAME: localhost:5000
+
+  s3-deployment:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Install dependencies
+        working-directory: ./front-end # change working directory to the react_app
+        run: yarn install # initializes yarn
+
+      - name: Build
+        working-directory: ./front-end # change working directory to the react_app
+        run: CI=false yarn build # builds the react app with warnings suppressed
+        env:
+          REACT_APP_HOST: ${{ secrets.REACT_APP_HOST }}
+
+      - name: Deploy
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: ./react_app/build
+          bucket: sql-query-test-app.ml
+          bucket-region: us-east-1
+          delete-removed: true # will delete any files on s3 that aren't present in build
+          private: true
+  
+  flask-app-deployment:
+    needs: test-suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH
+        uses: appleboy/ssh-action@master
+        env:
+          DB_NAME: ${{ secrets.DB_NAME }}
+          USERNAME: ${{ secrets.DB_USERNAME }}
+          PASSWORD: ${{ secrets.DB_PASSWORD }}
+          HOST:  ${{ secrets.DB_HOST }}
+          PORT: 5432
+        with:
+          host: ${{ secrets.BACKEND_HOST }}
+          username: ${{ secrets.BACKEND_USERNAME }}
+          key: ${{ secrets.KEY }}
+          envs: DB_NAME,USERNAME,PASSWORD,HOST,PORT
+          script: |
+            cd ~
+            rm -rf sql-query-test-application
+            git clone https://github.com/mo-ccc/sql-query-test-application.git
+            cd ./sql-query-test-application/back-end/src
+            python3 -m venv ./venv
+            source ./venv/bin/activate
+            pip install -r requirements.txt
+            echo "DB_NAME=${DB_NAME}" >> .env
+            echo "USERNAME=${USERNAME}" >> .env
+            echo "PASSWORD=${PASSWORD}" >> .env
+            echo "HOST=${HOST}" >> .env
+            echo "PORT=${PORT}" >> .env
