@@ -64,7 +64,7 @@ jobs:
       - name: Deploy
         uses: reggionick/s3-deploy@v3
         with:
-          folder: ./react_app/build
+          folder: ./front-end/build
           bucket: sql-query-test-app.ml
           bucket-region: us-east-1
           delete-removed: true # will delete any files on s3 that aren't present in build
@@ -78,15 +78,15 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           DB_NAME: ${{ secrets.DB_NAME }}
-          USERNAME: ${{ secrets.DB_USERNAME }}
-          PASSWORD: ${{ secrets.DB_PASSWORD }}
-          HOST:  ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST:  ${{ secrets.DB_HOST }}
           PORT: 5432
         with:
           host: ${{ secrets.BACKEND_HOST }}
           username: ${{ secrets.BACKEND_USERNAME }}
           key: ${{ secrets.KEY }}
-          envs: DB_NAME,USERNAME,PASSWORD,HOST,PORT
+          envs: DB_NAME,DB_USERNAME,DB_PASSWORD,DB_HOST,PORT
           script: |
             cd ~
             rm -rf sql-query-test-application
@@ -96,7 +96,7 @@ jobs:
             source ./venv/bin/activate
             pip install -r requirements.txt
             echo "DB_NAME=${DB_NAME}" >> .env
-            echo "USERNAME=${USERNAME}" >> .env
-            echo "PASSWORD=${PASSWORD}" >> .env
-            echo "HOST=${HOST}" >> .env
+            echo "USERNAME=${DB_USERNAME}" >> .env
+            echo "PASSWORD=${DB_PASSWORD}" >> .env
+            echo "HOST=${DB_HOST}" >> .env
             echo "PORT=${PORT}" >> .env
