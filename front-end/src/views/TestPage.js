@@ -26,7 +26,7 @@ const TestPage = () => {
   const handleExecute = () => {
     axios.post(`${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState})
     .then(response => {setResponseState(response.data); console.log(response)})
-    .catch(error => console.log(error))
+    .catch(error => {setResponseState(error.response.data); console.log(error)})
   }
 
   return(
