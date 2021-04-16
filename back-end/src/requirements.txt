@@ -18,5 +18,7 @@ python-dateutil==2.8.1
 python-dotenv==0.17.0
 python-editor==1.0.4
 six==1.15.0
+sql-metadata==1.11.0
 SQLAlchemy==1.4.7
+sqlparse==0.4.1
 Werkzeug==1.0.1
