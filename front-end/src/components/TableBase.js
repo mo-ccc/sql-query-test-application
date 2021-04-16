@@ -1,6 +1,3 @@
-import Col from "react-bootstrap/esm/Col"
-
-
 const TableBase = ({data}) => {
   if (!data) {
     return null

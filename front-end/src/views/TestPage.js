@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios'
 import TableBase from '../components/TableBase.js'
+import SchemaBase from '../components/SchemaBase.js'
 import Alert from 'react-bootstrap/Alert'
 
 const TestPage = () => {
@@ -35,7 +36,7 @@ const TestPage = () => {
       <h1>Question 1.</h1>
       <hr/>
       <Row>
-        <Col xs={12} md={6}>
+        <Col xs={12} md={8}>
           <h5>{state?.question?.prompt}</h5>
           <textarea style={{height: 100}} className="w-100 form-control" value={textareaState} onChange={handleAreaChange} />
           <Button className="m-1" onClick={handleExecute}>Execute</Button>
@@ -47,8 +48,12 @@ const TestPage = () => {
           <TableBase data={responseState?.result_set} />
           <h5>{responseState?.matches ? "query is correct" : "query is incorrect"}</h5>
         </Col>
-        <Col xs={12} md={6}>
-          <img src="https://vtb-league.com/app/plugins/photonic/include/images/placeholder.png" width="100%"/>
+        <Col className="p-4" xs={12} md={4} style={{overflowY: "scroll", height: 400}}>
+          <h3>Schema's</h3>
+          <hr/>
+          {state && Object.keys(state?.question?.tables).map(tableName => (
+            <SchemaBase key={tableName} name={tableName} data={state.question.tables[tableName]} />
+          ))}
         </Col>
       </Row>
       
