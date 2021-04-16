@@ -6,21 +6,21 @@ const TableBase = ({data}) => {
     return null
   }
   return(
-    <div className="mb-5" style={{"height": "300px", "overflow-y": "auto"}}>
+    <div className="mb-5" style={{"height": "200px", "overflowY": "auto"}}>
       <table className="table table-bordered table-sm table-hover table-striped">
         <thead className="thead-dark">
           <tr>
             {Object.keys(data?.[0]).map(field => (
-              <th style={{"position": "sticky", "top": 0}} key={field}>{field}</th>
+              <th key={field} style={{"position": "sticky", "top": 0}} >{field}</th>
             )
             )}
           </tr>
         </thead>
         <tbody>
-          {data?.map(row => (
-            <tr>
-              {Object.values(row).map(col => (
-                <td>{col?.toString() ?? "null"}</td>
+          {data?.map((row, rowid) => (
+            <tr key={`row#${rowid}`}>
+              {Object.values(row).map((col, colid) => (
+                <td key={`${row}.col#${colid}`}>{col?.toString() ?? "null"}</td>
               ))
               }
             </tr>

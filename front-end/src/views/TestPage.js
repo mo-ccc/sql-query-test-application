@@ -36,16 +36,15 @@ const TestPage = () => {
       <Row>
         <Col xs={12} md={6}>
           <h5>{state?.question?.prompt}</h5>
-          <textarea style={{height: 200}} className="w-100 form-control" value={textareaState} onChange={handleAreaChange} />
+          <textarea style={{height: 100}} className="w-100 form-control" value={textareaState} onChange={handleAreaChange} />
           <Button className="m-1" onClick={handleExecute}>Execute</Button>
           <h6>{responseState && responseState?.error}</h6>
+          <TableBase data={responseState?.result_set} />
+          <h5>{responseState?.matches ? "query is correct" : "query is incorrect"}</h5>
         </Col>
         <Col xs={12} md={6}>
           <img src="https://vtb-league.com/app/plugins/photonic/include/images/placeholder.png" width="100%"/>
         </Col>
-      </Row>
-      <Row>
-        <TableBase data={responseState?.result_set} />
       </Row>
       
     </div>
