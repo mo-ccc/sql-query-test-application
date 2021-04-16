@@ -39,7 +39,7 @@ const TestPage = () => {
           <h5>{state?.question?.prompt}</h5>
           <textarea style={{height: 100}} className="w-100 form-control" value={textareaState} onChange={handleAreaChange} />
           <Button className="m-1" onClick={handleExecute}>Execute</Button>
-          {responseState && 
+          {responseState?.error && 
             <Alert variant="danger">
               {responseState?.error}
             </Alert>

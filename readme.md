@@ -1,6 +1,9 @@
 # SQL query tester
+## Live deployment
+https://sqltestapp.ml
+
 ## Main Database
-![main_db](./docs/dbdiagram.png)
+<img src="./docs/dbdiagram.png" alt="main_db" width="70%"/>
 
 ## Plan
 1. When a user enters an email, main database is updated with a new `user` record and a new `test` record.
