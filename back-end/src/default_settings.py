@@ -43,4 +43,4 @@ elif environment == 'testing':
 elif environment == 'production':
     configuration = Production()
 else:
-    raise ValueError('FLASK_ENV is not set properly. use development, testing or production'
+    raise ValueError('FLASK_ENV is not set properly. use development, testing or production')
