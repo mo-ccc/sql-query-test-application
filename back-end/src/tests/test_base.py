@@ -1,6 +1,7 @@
 import unittest
 from main import db, create_app
 import commands
+import sqlalchemy
 
 class TestBase(unittest.TestCase):
     # ran before every test
@@ -8,6 +9,17 @@ class TestBase(unittest.TestCase):
     def setUp(cls):
         cls.app = create_app() # creates an app
         cls.app.config.from_object('default_settings.Testing') # forces testing configuration
+        test_uri = f"postgresql+psycopg2://postgres:postgres@localhost:5432/testdb"
+        cls.app.config["SQLALCHEMY_DATABASE_URI"] = test_uri
+
+        # removes the need to create database and schema for testing
+        # database and schema must still be created for env declared database
+        
+        engine = sqlalchemy.create_engine(test_uri)
+        # creates schema if not exists
+        if not engine.dialect.has_schema(engine, 'private'):
+            engine.execute(sqlalchemy.schema.CreateSchema('private'))
+
         cls.app_context = cls.app.app_context() # app_context is retrieved
         cls.app_context.push() # binds app context to the current context
         cls.client = cls.app.test_client() # test client is made using the app context
