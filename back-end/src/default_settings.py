@@ -22,6 +22,14 @@ class Development(Config):
     
 class Testing(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://postgres:postgres@localhost:5432/testdb"
+    # removes the need to create schema for testing db
+    # schema must still be created for main db
+    import sqlalchemy
+    engine = sqlalchemy.create_engine(SQLALCHEMY_DATABASE_URI)
+    # creates schema if not exists
+    if not engine.dialect.has_schema(engine, 'private'):
+        engine.execute(sqlalchemy.schema.CreateSchema('private'))
 
 class Production(Config):
     pass
@@ -35,4 +43,4 @@ elif environment == 'testing':
 elif environment == 'production':
     configuration = Production()
 else:
-    raise ValueError('FLASK_ENV is not set properly. use development, testing or production')
+    raise ValueError('FLASK_ENV is not set properly. use development, testing or production'

@@ -43,4 +43,4 @@ def register():
     # return the json containing the user data and the test id
     output = UserSchema().dump(user)
     output["tests"] = [TestSchema(only=("id",)).dump(test)]
-    return flask.jsonify(output)
+    return flask.jsonify(output), 201
