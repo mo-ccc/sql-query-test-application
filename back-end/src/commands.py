@@ -52,7 +52,7 @@ def seed_question():
     from models.Question import Question
     question = Question()
     question.prompt = "Write a query to get the number of unique Google users whose last login was in July, 2019, broken down by device type. Show the most used device in that period first."
-    question.answer_as_query = "SELECT COUNT(device_cat) from google_users GROUP BY device_cat ORDER BY COUNT(device_cat) desc;"
+    question.answer_as_query = "SELECT device_cat, COUNT(device_cat) as device_count from google_users GROUP BY device_cat ORDER BY device_count desc;"
     db.session.add(question)
     db.session.commit()
 
