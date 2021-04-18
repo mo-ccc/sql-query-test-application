@@ -3,3 +3,5 @@ PASSWORD=postgres
 HOST=postgres
 PORT=5432
 DB_NAME=sqltester
+FLASK_APP=main.py
+FLASK_ENV=production

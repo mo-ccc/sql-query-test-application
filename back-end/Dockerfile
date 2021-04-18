@@ -4,8 +4,8 @@ COPY . /flask_app/
 WORKDIR /flask_app/src
 EXPOSE 5000
 RUN pip install -r requirements.txt
-ENV FLASK_APP=main.py
-ENV FLASK_ENV=development
+ARG FLASK_APP=main.py
+ARG FLASK_ENV=production
 RUN cp .env.example .env
 CMD ["flask", "run", "-h", "0.0.0.0"]
 

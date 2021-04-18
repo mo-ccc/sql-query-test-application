@@ -46,6 +46,7 @@ services:
       - -c
       - |
         echo "running pre-setup"
+        flask db_custom initialize_schema
         flask db upgrade
         flask db_custom seed_question
         flask db_custom seed_secondary_tables
