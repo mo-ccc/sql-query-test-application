@@ -28,8 +28,6 @@ class TestBase(unittest.TestCase):
         db.create_all()
         runner.invoke(args=["db_custom", "seed_question"])
         
-        
-        
     # ran after every test
     @classmethod
     def tearDown(cls):

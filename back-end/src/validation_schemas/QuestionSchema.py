@@ -19,8 +19,11 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
         tables = sql_metadata.get_query_tables(query)
         tables_dict = {}
 
-        
-        with db.session.connection().connection.cursor() as curs:
+        # use the interactor role for this session for safety measure
+        binding = db.get_engine(bind="secondary_schema")
+        sess = db.create_scoped_session(options = {'bind': binding})
+
+        with sess.connection().connection.cursor() as curs:
             curs.execute("""SET search_path TO secondary_schema;""")
             for x in tables:
                 curs.execute(f"""SELECT column_name, data_type 

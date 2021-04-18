@@ -43,6 +43,11 @@ def seed_question():
     question.prompt = "Write a query to get the number of unique Google users whose last login was in July, 2019, broken down by device type. Show the most used device in that period first."
     question.answer_as_query = "SELECT device_cat, COUNT(device_cat) from google_users GROUP BY device_cat ORDER BY COUNT(device_cat) desc;"
     db.session.add(question)
+    db.session.flush()
+    question = Question()
+    question.prompt = "Write a query to fetch all columns for the user with the second highest user_id"
+    question.answer_as_query = "SELECT * FROM users ORDER BY user_id DESC LIMIT 1 OFFSET 1;"
+    db.session.add(question)
     db.session.commit()
 
 @db_custom.cli.command('seed_secondary_tables')

@@ -9,17 +9,7 @@ import os
 import json
 import datetime
 
-def myconverter(o):
-    if isinstance(o, datetime.datetime):
-        return o.__str__() # converts date time to string
-
-@tests.route('/test/<test_id>', methods=["GET"])
-def detail_get_test(test_id):
-    test = Test.query.get(test_id)
-    return flask.jsonify(TestSchema().dump(test))
-
-@tests.route('/test/<test_id>/execute', methods=["POST"])
-def execute_query_on_db(test_id):
+def run_query_against(test_id, query):
     # session creation
     binding = db.get_engine(bind="secondary_schema")
     sess = db.create_scoped_session(options = {'bind': binding})
@@ -32,25 +22,43 @@ def execute_query_on_db(test_id):
     result = {}
     answer = {} 
 
-    result_curs = sess.execute(flask.request.json["query"])
+    result_curs = sess.execute(query)
     result["keys"] = result_curs.keys()._keys
     result["rows"] = [[c for c in r] for r in result_curs.fetchall()]
-    
-    
-    # # runs the query_as_answer and compares results with user submitted
-    
+
+    # # runs the query_as_answer
     answer_result = sess.execute(question_answer)
-    
     answer["keys"] = answer_result.keys()._keys
     answer["rows"] = [[c for c in r] for r in answer_result.fetchall()]
-    print(answer)
 
+    return result, answer
+
+@tests.route('/test/<test_id>', methods=["GET"])
+def detail_get_test(test_id):
+    test = Test.query.get(test_id)
+    return flask.jsonify(TestSchema().dump(test))
+
+@tests.route('/test/<test_id>/execute', methods=["POST"])
+def execute_query_on_db(test_id):
+    result, answer = run_query_against(test_id, flask.request.json["query"])
+    # compare query_as_answer with user submitted
+    # then produce feedback text etc
     if flask.jsonify(result["rows"]).get_json() == flask.jsonify(answer["rows"]).get_json():
         result["matches"] = True # if they match, matches is set to true
-        result["message"] = "correct"
+        result["message"] = "Query correct"
     else:
         result["matches"] = False
-        result["message"] = f"was expecting {len(answer['rows'])} rows and {len(answer['keys'])} columns"
+        result["message"] = "Was expecting "
+        mismatches = 0
+        if len(answer['rows']) != len(result['rows']):
+            result["message"] += f"{len(answer['rows'])} rows"
+            mismatches += 1
+        if len(answer['keys']) != len(result['keys']):
+            result["message"] += " and "*mismatches + f"{len(answer['keys'])} columns"
+            mismatches += 1
+        if not mismatches:
+            result["message"] = "Query incorrect"
+    result["message"] += "."
 
     return flask.jsonify(result)
 

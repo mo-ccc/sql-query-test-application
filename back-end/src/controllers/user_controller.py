@@ -31,7 +31,7 @@ def register():
         flask.abort(500, description='no questions exist')
 
     # select a random question from the many
-    random_question = random.choice(Question.query.all())
+    random_question = random.choice(questions)
 
     # initializes a new test belonging to the user with the question attached
     test = Test()
