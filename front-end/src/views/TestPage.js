@@ -26,7 +26,7 @@ const TestPage = () => {
     axios.get(`${process.env.REACT_APP_HOST}/test/${externalState?.testId}`)
       .then(response => {setState(response?.data)})
         .catch(error => console.log(error?.response))
-  }, [])
+  }, [externalState, history, setState])
 
   // Keeping track of textarea state
   const handleAreaChange = (event) => {
