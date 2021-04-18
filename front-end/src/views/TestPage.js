@@ -35,13 +35,18 @@ const TestPage = () => {
 
   // Execute data is retrieved
   const handleExecute = () => {
-    axios.post(`${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState})
-      .then(response => {setResponseState(response?.data)})
-        .catch(error => {setResponseState(error.response?.data)})
+    axios.post(
+      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState})
+        .then(response => {setResponseState(response?.data)})
+          .catch(error => {setResponseState(error.response?.data)}
+      )
   }
 
   const handleSubmit = () => {
-    console.log(textareaState)
+    axios.post(
+      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/submit`, {query: textareaState})
+        .then(response => {console.log(response); history.push({pathname: '/finish', data: response.data})})
+          .catch(error => {console.log(error)})
   }
 
   if (!externalState) {
@@ -49,11 +54,11 @@ const TestPage = () => {
   }
   return(
     <div className="container">
-      <h1>Question</h1>
+      <h3>Question</h3>
       <hr/>
       <Row>
         <Col xs={12} md={8}>
-          <h5>{state?.question?.prompt}</h5>
+          <h6>{state?.question?.prompt}</h6>
           <textarea style={{height: 100}} className="w-100 form-control" value={textareaState} onChange={handleAreaChange} />
           <Button variant="outline-dark" className="m-1" onClick={handleExecute}>Execute</Button>
           <ModalConfirm handleSubmit={handleSubmit}/>
@@ -68,7 +73,7 @@ const TestPage = () => {
         </Col>
         <Col className="p-4" xs={12} md={4} style={{overflowY: "scroll", maxHeight: 600}}>
           <div>
-            <h3>Schema's</h3>
+            <h3>Question Schema's</h3>
             <hr/>
             {state && Object.keys(state?.question?.tables).map(tableName => (
               <SchemaBase key={tableName} name={tableName} data={state.question.tables[tableName]} />

@@ -10,7 +10,7 @@ const FeedBackText = ({data}) => {
       </pre>
         : 
       <pre style={{color: "red"}}>
-        {Object.keys(data?.issues).length ?
+        {data?.issues && Object.keys(data?.issues).length ?
           `expected: ${JSON.stringify(data?.issues, undefined, 1).replace(/(["{},])+/g, " ")}`
             :
           "query incorrect"
