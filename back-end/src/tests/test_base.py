@@ -19,13 +19,14 @@ class TestBase(unittest.TestCase):
         cls.client = cls.app.test_client() # test client is made using the app context
         runner = cls.app.test_cli_runner()
 
-        # database setup should occur before db is involved
+        # secondary tables and private schema setup should occur before db is involved
         runner.invoke(args=["db_custom", "initialize_schema"])
-        runner.invoke(args=["db_custom", "seed_question"])
         runner.invoke(args=["db_custom", "seed_secondary_tables"])
-
+        # drops all tables currently in db
         db.drop_all()
+        # then create all tables again and seed db with a question
         db.create_all()
+        runner.invoke(args=["db_custom", "seed_question"])
         
         
         
