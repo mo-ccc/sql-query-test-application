@@ -1,11 +1,10 @@
 const SchemaBase = ({name, data}) => {
-  console.log(data)
   if(!data) {
     return null
   }
   
   return (
-    <div className="mb-5">
+    <div className="mb-5" style={{fontSize: 12}}>
       <h5>{name}</h5>
       <table className="table table-bordered table-sm table-hover table-striped">
         <thead>

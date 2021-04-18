@@ -25,6 +25,7 @@ def run_query_against(test_id, query):
     result_curs = sess.execute(query)
     result["keys"] = result_curs.keys()._keys
     result["rows"] = [[c for c in r] for r in result_curs.fetchall()]
+    result["issues"] = {}
 
     # # runs the query_as_answer
     answer_result = sess.execute(question_answer)
@@ -45,20 +46,11 @@ def execute_query_on_db(test_id):
     # then produce feedback text etc
     if flask.jsonify(result["rows"]).get_json() == flask.jsonify(answer["rows"]).get_json():
         result["matches"] = True # if they match, matches is set to true
-        result["message"] = "Query correct"
     else:
         result["matches"] = False
-        result["message"] = "Was expecting "
-        mismatches = 0
-        if len(answer['rows']) != len(result['rows']):
-            result["message"] += f"{len(answer['rows'])} rows"
-            mismatches += 1
-        if len(answer['keys']) != len(result['keys']):
-            result["message"] += " and "*mismatches + f"{len(answer['keys'])} columns"
-            mismatches += 1
-        if not mismatches:
-            result["message"] = "Query incorrect"
-    result["message"] += "."
+        for x in ["rows", "keys"]:
+            if len(answer[x]) != len(result[x]):
+                result["issues"][x] = len(answer[x])
 
     return flask.jsonify(result)
 
