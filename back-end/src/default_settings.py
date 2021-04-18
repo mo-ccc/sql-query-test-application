@@ -14,9 +14,17 @@ class Config():
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{get_from_env('DB_URI')}"
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql+psycopg2://{get_from_env('USERNAME')}:"
+        f"{get_from_env('PASSWORD')}@{get_from_env('HOST')}:"
+        f"{get_from_env('PORT')}/{get_from_env('DB_NAME')}"
+    )
     SQLALCHEMY_BINDS = {
-        "secondary_schema": f"postgresql+psycopg2://interactor:{get_from_env('PASSWORD')}@{get_from_env('HOST')}:{get_from_env('PORT')}/{get_from_env('DB_NAME')}"
+        "secondary_schema": (
+            f"postgresql+psycopg2://interactor:"
+            f"{get_from_env('PASSWORD')}@{get_from_env('HOST')}:"
+            f"{get_from_env('PORT')}/{get_from_env('DB_NAME')}"
+        )
     }
 
 class Development(Config):

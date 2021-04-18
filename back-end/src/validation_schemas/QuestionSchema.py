@@ -1,4 +1,4 @@
-from main import ma
+from main import ma, db
 from marshmallow import fields, post_dump
 from models.Question import Question
 import sql_metadata
@@ -19,19 +19,14 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
         tables = sql_metadata.get_query_tables(query)
         tables_dict = {}
 
-        import psycopg2
-        import os
-        conn = psycopg2.connect(
-            host=os.getenv("HOST"), 
-            dbname=os.getenv("DB_URI").split("/")[-1],
-            user="interactor", password=os.getenv("PASSWORD"),
-            port=os.getenv("PORT")
-        )
-        with conn.cursor() as curs:
+        
+        with db.session.connection().connection.cursor() as curs:
             curs.execute("""SET search_path TO secondary_schema;""")
             for x in tables:
                 curs.execute(f"""SELECT column_name, data_type 
-                FROM (SELECT * FROM information_schema.columns WHERE table_schema NOT IN ('information_schema','pg_catalog') ORDER BY table_schema, table_name) AS c WHERE table_name='{x}';
+                FROM (SELECT * FROM information_schema.columns
+                WHERE table_schema NOT IN ('information_schema','pg_catalog')
+                ORDER BY table_schema, table_name) AS c WHERE table_name='{x}';
                 """)
                 tables_dict[x] = curs.fetchall()
         data["tables"] = tables_dict

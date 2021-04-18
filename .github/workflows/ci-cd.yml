@@ -20,6 +20,14 @@ jobs:
         ports:
           # Maps tcp port 5432 on service to host
           - 5432:5432
+    env:
+      FLASK_APP: main.py
+      FLASK_ENV: testing
+      USERNAME: postgres
+      PASSWORD: postgres
+      HOST: localhost
+      PORT: 5432
+      DB_NAME: testdb
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -33,19 +41,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [[ -f back-end/src/requirements.txt ]]; then pip install -r back-end/src/requirements.txt; fi
+
+      - name: db setup
+        run: |
+          flask db_custom seed_secondary_tables
           
       - name: run unittest
         run: python -m unittest discover back-end/src/ -v
-        env:
-          FLASK_APP: main.py
-          FLASK_ENV: testing
-          USERNAME: postgres
-          PASSWORD: postgres
-          HOST: localhost
-          PORT: 5432
-          DB_NAME: testdb
-          DB_URI: postgres:postgres@localhost:5432/testdb
-          HOSTNAME: localhost:5000
 
   s3-deployment:
     runs-on: ubuntu-latest
@@ -108,7 +110,6 @@ jobs:
             echo "PASSWORD=${DB_PASSWORD}" >> .env
             echo "HOST=${DB_HOST}" >> .env
             echo "PORT=${DB_PORT}" >> .env
-            echo "DB_URI=${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" >> .env
             echo "FLASK_APP=main.py" >> .env
             echo "FLASK_ENV=production" >> .env
             sudo systemctl start sqltester.service
