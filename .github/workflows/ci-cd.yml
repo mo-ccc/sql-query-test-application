@@ -39,6 +39,11 @@ jobs:
         env:
           FLASK_APP: main.py
           FLASK_ENV: testing
+          USERNAME: postgres
+          PASSWORD: postgres
+          HOST: localhost
+          PORT: 5432
+          DB_NAME: testdb
           DB_URI: postgres:postgres@localhost:5432/testdb
           HOSTNAME: localhost:5000
 

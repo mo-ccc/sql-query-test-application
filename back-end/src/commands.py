@@ -6,104 +6,90 @@ import dotenv
 import os
 dotenv.load_dotenv()
 
-conn_args = {
-    "host": os.getenv("HOST"), 
-    "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("USERNAME"), 
-    "password": os.getenv("PASSWORD"),
-    "port": os.getenv("PORT")
-}
-
 db_custom = flask.Blueprint('db_custom', __name__)
 
+# will try to create the schema
+# if it fails will check error to ensure it is because schema exists
+# if the schema existed will print it did
+# or will print the actual error that occurred
 @db_custom.cli.command('initialize_schema')
 def initialize_schema():
-    import psycopg2
-    with psycopg2.connect(**conn_args) as conn:
-        conn.autocommit = True
-        with conn.cursor() as curs:
-            curs.execute("""DROP SCHEMA IF EXISTS private;""")
-            curs.execute("""CREATE SCHEMA IF NOT EXISTS private;""")
-    print("schema_initialized")
+    from psycopg2.errors import DuplicateSchema
+    try:
+        db.session.execute("""CREATE SCHEMA private;""")
+        db.session.commit()
+        print("schema_initialized")
+    except Exception as e:
+        if isinstance(e.orig, DuplicateSchema):
+            print("schema already exists")
+        else:
+            print(e)
 
-
-@db_custom.cli.command('initialize_db')
-def initialize_db():
-    import psycopg2
-    copy_args = conn_args.copy()
-    copy_args["dbname"] = "postgres" # initializing a connect with default dbname instead
-    with psycopg2.connect(**copy_args) as conn: # create a connection using ctx manager
-        conn.autocommit = True
-        with conn.cursor() as curs: # initialize a cursor
-            curs.execute(f"""DROP DATABASE IF EXISTS {os.getenv("DB_NAME")};""")
-            curs.execute(f"""CREATE DATABASE {os.getenv("DB_NAME")};""")
-    initialize_schema()
-    print("db initialized")
-    
-
-@db_custom.cli.command('drop')
+# drops all tables in private schema and secondary_schema 
+@db_custom.cli.command('drop_tables')
 def drop_db():
     db.drop_all()
-    db.engine.execute("DROP TABLE IF EXISTS alembic_version;")
+    db.session.execute("DROP TABLE IF EXISTS alembic_version;")
+    db.session.execute("DROP TABLE IF EXISTS secondary_schema.users;")
+    db.session.execute("DROP TABLE IF EXISTS secondary_schema.google_users;")
+    db.session.commit()
     print("dropped all tables")
 
+# adds a question to the question table. use this after dropping all tables.
 @db_custom.cli.command('seed_question')
 def seed_question():
     from models.Question import Question
     question = Question()
     question.prompt = "Write a query to get the number of unique Google users whose last login was in July, 2019, broken down by device type. Show the most used device in that period first."
-    question.answer_as_query = "SELECT device_cat, COUNT(device_cat) as device_count from google_users GROUP BY device_cat ORDER BY device_count desc;"
+    question.answer_as_query = "SELECT device_cat, COUNT(device_cat) from google_users GROUP BY device_cat ORDER BY COUNT(device_cat) desc;"
     db.session.add(question)
     db.session.commit()
 
 @db_custom.cli.command('seed_secondary_tables')
 def seed_secondary_tables():
-    import psycopg2
-    with psycopg2.connect(**conn_args) as conn:
-        with conn.cursor() as curs: # initialize a cursor
-            curs.execute("""DROP TABLE IF EXISTS secondary_schema.users;""")
-            curs.execute("""DROP TABLE IF EXISTS secondary_schema.google_users;""")
-            print("dropped secondary tables")
-            curs.execute("""DROP SCHEMA IF EXISTS secondary_schema;""")
-            curs.execute("""CREATE SCHEMA IF NOT EXISTS secondary_schema;""")
-            curs.execute("""SET search_path TO secondary_schema;""")
-            print("created secondary_schema")
-            conn.commit()
+    db.session.execute("""DROP TABLE IF EXISTS secondary_schema.users;""")
+    db.session.execute("""DROP TABLE IF EXISTS secondary_schema.google_users;""")
+    print("dropped secondary tables")
+    db.session.execute("""DROP SCHEMA IF EXISTS secondary_schema;""")
+    db.session.execute("""CREATE SCHEMA IF NOT EXISTS secondary_schema;""")
+    db.session.execute("""SET search_path TO secondary_schema;""")
+    db.session.commit()
+    print("created secondary_schema")
+    try:
+        db.session.execute(f"""REVOKE CONNECT ON DATABASE {os.getenv("DB_NAME")} FROM interactor;""")
+        db.session.execute("""DROP ROLE interactor;""")
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        print("interactor role does not exist. will be created")
+        db.session.rollback()
+    
+    db.session.execute("""CREATE ROLE interactor LOGIN;""")
+    db.session.execute(f"""ALTER ROLE interactor WITH PASSWORD '{os.getenv("PASSWORD")}'""")
+    db.session.execute(f"""GRANT CONNECT ON DATABASE {os.getenv("DB_NAME")} TO interactor""")
+    db.session.execute("""GRANT USAGE ON SCHEMA secondary_schema TO interactor;""")
+    print("created interactor role with permissions")
 
-            try:
-                curs.execute(f"""REVOKE CONNECT ON DATABASE {os.getenv("DB_NAME")} FROM interactor;""")
-                curs.execute("""DROP ROLE interactor;""")
-            except:
-                print("interactor role does not exist. will be created")
-                curs.execute("""ROLLBACK;""")
-                conn.commit()
-        
-            curs.execute("""CREATE ROLE interactor LOGIN;""")
-            curs.execute(f"""ALTER ROLE interactor WITH PASSWORD '{os.getenv("PASSWORD")}'""")
-            curs.execute(f"""GRANT CONNECT ON DATABASE {os.getenv("DB_NAME")} TO interactor""")
-            curs.execute("""GRANT USAGE ON SCHEMA secondary_schema TO interactor;""")
-            print("created interactor role with permissions")
+    db.session.execute("""CREATE TABLE IF NOT EXISTS
+    google_users(id INTEGER PRIMARY KEY, user_id INTEGER, browser_language VARCHAR, created_on TIMESTAMP WITHOUT TIME ZONE, device_cat VARCHAR);
+    """)
 
-            curs.execute("""CREATE TABLE IF NOT EXISTS
-            google_users(id INTEGER PRIMARY KEY, user_id INTEGER, browser_language VARCHAR, created_on TIMESTAMP WITHOUT TIME ZONE, device_cat VARCHAR);
-            """)
+    db.session.execute("""CREATE TABLE IF NOT EXISTS
+    users(user_id INTEGER PRIMARY KEY, is_activated BOOLEAN, signed_up_on TIMESTAMP WITHOUT TIME ZONE, last_login TIMESTAMP WITHOUT TIME ZONE, sign_up_source VARCHAR, unsubscribed INTEGER, user_type INTEGER);
+    """)
+    print("created secondary tables")
 
-            curs.execute("""CREATE TABLE IF NOT EXISTS
-            users(user_id INTEGER PRIMARY KEY, is_activated BOOLEAN, signed_up_on TIMESTAMP WITHOUT TIME ZONE, last_login TIMESTAMP WITHOUT TIME ZONE, sign_up_source VARCHAR, unsubscribed INTEGER, user_type INTEGER);
-            """)
-            print("created secondary tables")
+    db.session.execute("""GRANT SELECT ON secondary_schema.users, secondary_schema.google_users TO interactor;""")
+    print("gave select permissions on secondary tables to interactor")
+    db.session.commit()
+    
+    with db.session.connection().connection.cursor() as raw_curs:
+        with open('./dumps/google_users.txt', 'r') as f:
+            raw_curs.copy_expert("""COPY secondary_schema.google_users FROM STDIN""", f)
 
-            curs.execute("""GRANT SELECT ON secondary_schema.users, secondary_schema.google_users TO interactor;""")
-            print("gave select permissions on secondary tables to interactor")
-            conn.commit()
-            
-            with open('./dumps/google_users.txt', 'r') as f:
-                curs.copy_expert("""COPY google_users FROM STDIN""", f)
-            conn.commit()
-
-            with open('./dumps/users.txt', 'r') as f:
-                curs.copy_expert("""COPY users FROM STDIN""", f)
-            conn.commit()
-            print("dumped data to secondary tables successfully")
+        with open('./dumps/users.txt', 'r') as f:
+            raw_curs.copy_expert("""COPY secondary_schema.users FROM STDIN""", f)
+    db.session.commit()
+    print("dumped data to secondary tables successfully")
 
     
