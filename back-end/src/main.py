@@ -1,5 +1,4 @@
 import flask
-from werkzeug.exceptions import HTTPException
 
 import flask_sqlalchemy
 db = flask_sqlalchemy.SQLAlchemy()
@@ -29,13 +28,17 @@ def create_app():
     app.register_blueprint(db_custom)
 
     import os
-    if os.getenv("FLASK_ENV") == "production":
+    from werkzeug.exceptions import HTTPException
+    from marshmallow import ValidationError
+    if os.getenv("FLASK_ENV") != "development":
         @app.errorhandler(Exception)
         def handle_error(e):
-            print(e)
             code = 500
+            if isinstance(e, ValidationError):
+                code = 400
             if isinstance(e, HTTPException):
                 code = e.code
+
             return flask.jsonify(error=str(e)), code
 
     return app

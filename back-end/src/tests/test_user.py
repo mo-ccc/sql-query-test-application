@@ -8,3 +8,10 @@ class TestUser(TestBase):
         )
         self.assertIn('tests', response.json)
         self.assertEqual(response.status_code, 201)
+
+    def test_invalid_email(self):
+        response = self.client.post(
+            '/user',
+            json={"email": "invalidemail"}
+        )
+        self.assertEqual(response.status_code, 400)

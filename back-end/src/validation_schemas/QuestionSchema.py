@@ -7,7 +7,7 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Question
         #load_only = ("answer_as_query", )
-    answer_as_query = fields.String()
+
 
     # this massive function takes the answer_as_query
     # and parses all the tables from the query
