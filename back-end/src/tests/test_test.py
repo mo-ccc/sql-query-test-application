@@ -27,9 +27,47 @@ class TestUser(TestBase):
     def test_execute_error(self):
         response = self.client.post(
             '/test/1/execute',
-            json={"query": "select s from table;"}
+            json={"query": "select * from user1;"}
         )
         self.assertEqual(response.status_code, 400)
-        self.assertIn("syntax error", response.json["error"])
+        self.assertEqual("relation \"user1\" does not exist", response.json["error"])
 
+    def test_submit_correct(self):
+        response = self.client.post(
+            '/test/1/submit',
+            json={"query": ("SELECT device_cat, COUNT(device_cat) AS b FROM google_users "
+                            "GROUP BY device_cat ORDER BY b DESC;")}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["result"], 1)
+
+    def test_submit_incorrect(self):
+        response = self.client.post(
+            '/test/1/submit',
+            json={"query": "SELECT user_id FROM users LIMIT 3;"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["result"], 0)
+
+    def test_submit_error(self):
+        response = self.client.post(
+            '/test/1/submit',
+            json={"query": "SELECT from user1;"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["result"], 0)
+
+    def test_submit_twice(self):
+        response = self.client.post(
+            '/test/1/submit',
+            json={"query": "SELECT from user1;"}
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            '/test/1/submit',
+            json={"query": "SELECT from user1;"}
+        )
+        self.assertEqual(response.status_code, 400)
+
+    
     
