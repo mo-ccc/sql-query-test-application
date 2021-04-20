@@ -1,6 +1,6 @@
 from .test_base import TestBase
 
-class TestUser(TestBase):
+class TestTest(TestBase):
     def test_get_test(self):
         response = self.client.get('/test/1')
         self.assertEqual(response.status_code, 200)
