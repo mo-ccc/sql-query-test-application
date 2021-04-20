@@ -32,16 +32,16 @@ def create_app():
     from marshmallow import ValidationError
     from sqlalchemy.exc import ProgrammingError
     if os.getenv("FLASK_ENV") != "development":
-        @app.errorhandler(Exception)
-        def handle_error(e):
-            code = 500
-            if isinstance(e, ValidationError):
-                code = 400
-            if isinstance(e, HTTPException):
-                code = e.code
-            if isinstance(e, ProgrammingError):
-                return flask.jsonify(error=str(e.orig).split("\n")[0]), 400
+        @app.errorhandler(HTTPException)
+        def handle_HTTP_error(e):
+            return flask.jsonify(error=str(e)), e.code
 
-            return flask.jsonify(error=str(e)), code
+        @app.errorhandler(ProgrammingError)
+        def handle_pyscopg2_error(e):
+            return flask.jsonify(error=str(e.orig).split("\n")[0]), 400
+        
+        @app.errorhandler(ValidationError)
+        def handle_validation_error(e):
+            return flask.jsonify(error=str(e)), 400
 
     return app

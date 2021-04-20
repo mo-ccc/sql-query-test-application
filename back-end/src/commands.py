@@ -8,6 +8,8 @@ dotenv.load_dotenv()
 
 db_custom = flask.Blueprint('db_custom', __name__)
 
+directory = os.path.dirname(__file__)
+
 # will try to create the schema
 # if it fails will check error to ensure it is because schema exists
 # if the schema existed will print it did
@@ -41,7 +43,7 @@ def seed_question():
     from models.Question import Question
     from validation_schemas.QuestionSchema import QuestionSchema
     import json
-    directory = os.path.dirname(__file__)
+    
     with open(os.path.join(directory, 'dumps/questions.json')) as f:
         questions = json.load(f)
         for question in questions:
@@ -71,18 +73,20 @@ def seed_secondary_tables():
         db.session.rollback()
     
     db.session.execute("""CREATE ROLE interactor LOGIN;""")
-    db.session.execute(f"""ALTER ROLE interactor WITH PASSWORD '{os.getenv("PASSWORD")}'""")
-    db.session.execute(f"""GRANT CONNECT ON DATABASE {os.getenv("DB_NAME")} TO interactor""")
+    db.session.execute(f"""ALTER ROLE interactor WITH PASSWORD '{os.getenv("PASSWORD")}';""")
+    db.session.execute(f"""GRANT CONNECT ON DATABASE {os.getenv("DB_NAME")} TO interactor;""")
     db.session.execute("""GRANT USAGE ON SCHEMA secondary_schema TO interactor;""")
     print("created interactor role with permissions")
 
-    db.session.execute("""CREATE TABLE IF NOT EXISTS
+    db.session.execute("""CREATE TABLE IF NOT EXISTS 
     google_users(id INTEGER PRIMARY KEY, user_id INTEGER, browser_language VARCHAR, created_on TIMESTAMP WITHOUT TIME ZONE, device_cat VARCHAR);
     """)
+    db.session.commit()
 
-    db.session.execute("""CREATE TABLE IF NOT EXISTS
+    db.session.execute("""CREATE TABLE IF NOT EXISTS 
     users(user_id INTEGER PRIMARY KEY, is_activated BOOLEAN, signed_up_on TIMESTAMP WITHOUT TIME ZONE, last_login TIMESTAMP WITHOUT TIME ZONE, sign_up_source VARCHAR, unsubscribed INTEGER, user_type INTEGER);
     """)
+    db.session.commit()
     print("created secondary tables")
 
     db.session.execute("""GRANT SELECT ON secondary_schema.users, secondary_schema.google_users TO interactor;""")
@@ -90,10 +94,10 @@ def seed_secondary_tables():
     db.session.commit()
     
     with db.session.connection().connection.cursor() as raw_curs:
-        with open('./dumps/google_users.txt', 'r') as f:
+        with open(os.path.join(directory, 'dumps/google_users.txt'), 'r') as f:
             raw_curs.copy_expert("""COPY secondary_schema.google_users FROM STDIN""", f)
 
-        with open('./dumps/users.txt', 'r') as f:
+        with open(os.path.join(directory, './dumps/users.txt'), 'r') as f:
             raw_curs.copy_expert("""COPY secondary_schema.users FROM STDIN""", f)
     db.session.commit()
     print("dumped data to secondary tables successfully")
