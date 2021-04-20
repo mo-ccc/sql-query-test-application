@@ -46,6 +46,7 @@ class TestTest(TestBase):
             '/test/1/submit',
             json={"query": "SELECT user_id FROM users LIMIT 3;"}
         )
+        print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["result"], 0)
 
