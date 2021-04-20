@@ -1,5 +1,5 @@
 from main import ma, db
-from marshmallow import fields, post_dump
+from marshmallow import post_dump, validates_schema
 from models.Question import Question
 import sql_metadata
 
@@ -7,8 +7,11 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Question
         #load_only = ("answer_as_query", )
-
-
+    
+    @validates_schema(skip_on_field_errors=True)
+    def answer_as_query_validator(self, data, **kwargs):
+        print(data)
+    
     # this massive function takes the answer_as_query
     # and parses all the tables from the query
     # then generates a schema for each table
