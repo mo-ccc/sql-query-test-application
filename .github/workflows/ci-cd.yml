@@ -33,6 +33,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [[ -f back-end/src/requirements.txt ]]; then pip install -r back-end/src/requirements.txt; fi
+          back-end/src
           flask db_custom initialize_schema
           flask db_custom seed_secondary_tables
           
