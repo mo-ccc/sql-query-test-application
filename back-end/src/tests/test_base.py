@@ -20,14 +20,11 @@ class TestBase(unittest.TestCase):
         cls.client = cls.app.test_client() # test client is made using the app context
         runner = cls.app.test_cli_runner()
 
-        # private schema setup should occur before db is involved
-        runner.invoke(args=["db_custom", "initialize_schema"])
         # drops all tables currently in db
-        runner.invoke(args=["db_custom", "drop_tables"])
+        db.drop_all()
         # then create all tables again and seed db
         db.create_all()
         runner.invoke(args=["db_custom", "seed_question"])
-        runner.invoke(args=["db_custom", "seed_secondary_tables"])
         
         db.session.add(User(email="test@email.com"))
         db.session.flush()
@@ -39,6 +36,5 @@ class TestBase(unittest.TestCase):
     def tearDown(cls):
         db.session.remove()
         runner = cls.app.test_cli_runner()
-        runner.invoke(args=["db_custom", "drop_tables"])
         db.create_all()
         cls.app_context.pop() # app context is popped from the context

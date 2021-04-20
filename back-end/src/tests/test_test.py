@@ -13,7 +13,6 @@ class TestTest(TestBase):
             json={"query": ("SELECT device_cat, COUNT(device_cat) AS a FROM google_users "
                             "GROUP BY device_cat ORDER BY a DESC;")}
         )
-        print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertIn("rows", response.json)
         self.assertFalse(response.json["issues"])
@@ -23,7 +22,6 @@ class TestTest(TestBase):
             '/test/1/execute',
             json={"query": "SELECT * FROM users LIMIT 1;"}
         )
-        print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json["issues"])
 
