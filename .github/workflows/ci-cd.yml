@@ -33,13 +33,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [[ -f back-end/src/requirements.txt ]]; then pip install -r back-end/src/requirements.txt; fi
-          cd back-end/src
-          flask db_custom initialize_schema
-          flask db_custom seed_secondary_tables
+          
           
       - name: run unittest
         timeout-minutes: 3
-        run: python -m unittest discover back-end/src -v
+        run: |
+          cd back-end/src
+          flask db_custom initialize_schema
+          flask db_custom seed_secondary_tables
+          python -m unittest -v
         env:
           FLASK_APP: main.py
           FLASK_ENV: testing
