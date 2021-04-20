@@ -16,13 +16,13 @@ class TestTest(TestBase):
         self.assertIn("rows", response.json)
         self.assertFalse(response.json["issues"])
     
-    def test_execute_incorrect(self):
-        response = self.client.post(
-            '/test/1/execute',
-            json={"query": "SELECT * FROM users LIMIT 1;"}
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json["issues"])
+    # def test_execute_incorrect(self):
+    #     response = self.client.post(
+    #         '/test/1/execute',
+    #         json={"query": "SELECT * FROM users LIMIT 1;"}
+    #     )
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTrue(response.json["issues"])
 
     def test_execute_error(self):
         response = self.client.post(

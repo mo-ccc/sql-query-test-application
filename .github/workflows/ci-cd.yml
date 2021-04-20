@@ -36,7 +36,7 @@ jobs:
           
       - name: run unittest
         timeout-minutes: 3
-        run: pytest back-end/src/tests
+        run: python -m unittest discover back-end/src -v
         env:
           FLASK_APP: main.py
           FLASK_ENV: testing
