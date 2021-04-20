@@ -32,14 +32,14 @@ class TestTest(TestBase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual("relation \"user1\" does not exist", response.json["error"])
 
-    def test_submit_correct(self):
-        response = self.client.post(
-            '/test/1/submit',
-            json={"query": ("SELECT device_cat, COUNT(device_cat) AS b FROM google_users "
-                            "GROUP BY device_cat ORDER BY b DESC;")}
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["result"], 1)
+    # def test_submit_correct(self):
+    #     response = self.client.post(
+    #         '/test/1/submit',
+    #         json={"query": ("SELECT device_cat, COUNT(device_cat) AS b FROM google_users "
+    #                         "GROUP BY device_cat ORDER BY b DESC;")}
+    #     )
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.json["result"], 1)
 
     def test_submit_incorrect(self):
         response = self.client.post(
