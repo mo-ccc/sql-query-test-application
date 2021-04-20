@@ -1,5 +1,7 @@
 import unittest
 from main import db, create_app
+from models.User import User
+from models.Test import Test
 import commands
 import sqlalchemy
 
@@ -27,6 +29,11 @@ class TestBase(unittest.TestCase):
         # then create all tables again and seed db with a question
         db.create_all()
         runner.invoke(args=["db_custom", "seed_question"])
+
+        db.session.add(User(email="test@email.com"))
+        db.session.flush()
+        db.session.add(Test(user_id=1, question_id=1))
+        db.session.commit()
         
     # ran after every test
     @classmethod

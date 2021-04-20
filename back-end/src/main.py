@@ -30,6 +30,7 @@ def create_app():
     import os
     from werkzeug.exceptions import HTTPException
     from marshmallow import ValidationError
+    from sqlalchemy.exc import ProgrammingError
     if os.getenv("FLASK_ENV") != "development":
         @app.errorhandler(Exception)
         def handle_error(e):
@@ -38,6 +39,8 @@ def create_app():
                 code = 400
             if isinstance(e, HTTPException):
                 code = e.code
+            if isinstance(e, ProgrammingError):
+                return flask.jsonify(error=str(e.orig).split("\n")[0]), 400
 
             return flask.jsonify(error=str(e)), code
 
