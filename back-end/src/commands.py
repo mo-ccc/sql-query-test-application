@@ -41,12 +41,15 @@ def seed_question():
     from models.Question import Question
     from validation_schemas.QuestionSchema import QuestionSchema
     import json
-    with open('./dumps/questions.json') as f:
+    directory = os.path.dirname(__file__)
+    with open(os.path.join(directory, 'dumps/questions.json')) as f:
         questions = json.load(f)
         for question in questions:
             db.session.add(Question(**question))
             db.session.flush()
-    db.session.commit()
+            print("added")
+        db.session.commit()
+    
 
 @db_custom.cli.command('seed_secondary_tables')
 def seed_secondary_tables():
