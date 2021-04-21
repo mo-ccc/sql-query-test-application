@@ -1,9 +1,12 @@
-import React from 'react'
+import {useEffect} from 'react'
 import _ from 'lodash';
 import { useForm } from 'react-hook-form'
 
-const FormBase = ({defaultData, onSubmit, formMeta, fields}) => {
-  const {register, handleSubmit, errors} = useForm(formMeta)
+const FormBase = ({defaultData, onSubmit, formMeta, fields, submitLabel}) => {
+  const {register, handleSubmit, errors, setError} = useForm(formMeta)
+  useEffect(() => {
+    setError(fields?.[0]?.name, "fill me") // this makes submit disabled by default
+  }, [])
 
   // if no values are given for an option. values will default to i
   // if no labels are given for an option. labels will default to values
@@ -34,7 +37,7 @@ const FormBase = ({defaultData, onSubmit, formMeta, fields}) => {
       </div>
     )
   }
-  
+  // this render will use renderInput to render a form group with surrounding error messages
   const renderer = (item, i, noBot) => (
     <div className="form-group" key={item.name} style={noBot && {marginBottom: 0}}>
       {item.label && <label>{item.label}</label>}
@@ -54,7 +57,7 @@ const FormBase = ({defaultData, onSubmit, formMeta, fields}) => {
       {fields.map((item, i) => {
         return renderer(item, i)
       })}
-      <input type="submit" className="btn btn-primary"/>
+      <input disabled={Object.keys(errors).length} type="submit" className="btn btn-primary" value={submitLabel}/>
     </form>
   )
 }
