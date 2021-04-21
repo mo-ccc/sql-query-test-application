@@ -89,6 +89,10 @@ paths:
                     type: integer
                   prompt:
                     type: string
+                  tables:
+                    type: object
+                    example:
+                      users: [[id, varchar], [created_on, timestamp]]
                   
   /test/{testID}/execute/:
     post:
@@ -118,12 +122,25 @@ paths:
           schema:
             type: object
             properties:
-              matches:
-                type: boolean
-              result_set:
+              issues:
+                type: object
+                example:
+                  {rows: 2, keys: 2}
+              keys:
                 type: array
                 items:
-                  type: object
+                  example:
+                    [user_id, is_activated]
+              matches:
+                type: boolean
+              rows:
+                type: array
+                items:
+                  type: array
+                  items:
+                    example:
+                      [100, 20, true, phone]
+                
                 
   /test/{testID}/submit/:
     post:
@@ -170,4 +187,7 @@ paths:
                     type: integer
                   prompt:
                     type: string
-    
+                  tables:
+                    type: object
+                    example:
+                      users: [[id, varchar], [created_on, timestamp]]

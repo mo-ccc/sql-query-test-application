@@ -8,6 +8,6 @@
     },
     {
         "prompt": "Write a query to retrieve user_ids present in both tables along with their device_cat and the datetime they signed up on ordered by user_id",
-        "answer_as_query": "SELECT u.user_id, gu.device_cat, u.signed_up_on FROM users u INNER JOIN google_users gu ON u.user_id=gu.user_id;"
+        "answer_as_query": "SELECT u.user_id, gu.device_cat, u.signed_up_on FROM users u INNER JOIN google_users gu ON u.user_id=gu.user_id ORDER BY u.user_id;"
     }
 ]

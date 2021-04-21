@@ -47,21 +47,21 @@ const TestPage = () => {
     }
     axios.post(
       `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState}
-      ).then(response => {setResponseState(response?.data)})
-        .catch(error => {
-          if (error?.response) {
-            setResponseState(error?.response?.data)
-          }else{
-            handleError(error)
-          }
-        })
+    ).then(response => {setResponseState(response?.data)})
+      .catch(error => {
+        if (error?.response) {
+          setResponseState(error?.response?.data)
+        }else{
+          handleError(error)
+        }
+      })
   }
 
   const handleSubmit = () => {
     axios.post(
       `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/submit`, {query: textareaState}
-      ).then(response => {history.push({pathname: '/finish', data: response.data})})
-        .catch(error => {handleError(error)}
+    ).then(response => {history.push({pathname: '/finish', data: response.data})})
+      .catch(error => {handleError(error)}
     )
   }
 
