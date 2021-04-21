@@ -33,24 +33,42 @@ const TestPage = () => {
     setTextareaState(event.target.value)
   }
 
+  const handleError = (error) => {
+    if (error.response){
+      setResponseState(error.response.data)
+    }
+    else{
+      setResponseState({error: "Failed to connect to origin server"})
+    }
+  }
+
   // Execute data is retrieved
   const handleExecute = () => {
+    // early return if no query
+    if (!textareaState) {
+      setResponseState({error: "missing query"})
+      return
+    }
     axios.post(
-      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState})
-        .then(response => {setResponseState(response?.data)})
-          .catch(error => {setResponseState(error.response?.data)}
-      )
+      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState}
+      ).then(response => {setResponseState(response?.data)})
+        .catch(error => {handleError(error)}
+    )
   }
 
   const handleSubmit = () => {
     axios.post(
-      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/submit`, {query: textareaState})
-        .then(response => {console.log(response); history.push({pathname: '/finish', data: response.data})})
-          .catch(error => {console.log(error)})
+      `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/submit`, {query: textareaState}
+      ).then(response => {history.push({pathname: '/finish', data: response.data})})
+        .catch(error => {setResponseState({error: "An error occurred"})}
+    )
   }
 
   if (!externalState) {
     return null
+  }
+  if (state?.time_submitted) {
+    return <h1>This test has already been submitted</h1>
   }
   return(
     <div className="container">
@@ -69,7 +87,6 @@ const TestPage = () => {
           }
           <TableBase className="mt-3 mb-3 border-bottom" data={responseState} />
           <FeedBackText data={responseState} />
-          
         </Col>
         <Col className="p-4" xs={12} md={4} style={{overflowY: "scroll", maxHeight: 600}}>
           <div>

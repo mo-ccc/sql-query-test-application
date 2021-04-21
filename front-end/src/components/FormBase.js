@@ -6,7 +6,7 @@ const FormBase = ({defaultData, onSubmit, formMeta, fields, submitLabel}) => {
   const {register, handleSubmit, errors, setError} = useForm(formMeta)
   useEffect(() => {
     setError(fields?.[0]?.name, "fill me") // this makes submit disabled by default
-  }, [])
+  }, [fields, setError])
 
   // if no values are given for an option. values will default to i
   // if no labels are given for an option. labels will default to values
