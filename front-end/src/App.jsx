@@ -2,6 +2,7 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import LandingPage from './views/LandingPage.jsx'
 import TestPage from './views/TestPage.jsx'
 import ThankYouPage from './views/ThankYouPage.jsx'
+import NotificationAlert from './components/NotificationAlert'
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           <Redirect to="/404" />
         </Route>
       </Switch>
+      <NotificationAlert />
     </div>
   )
 }

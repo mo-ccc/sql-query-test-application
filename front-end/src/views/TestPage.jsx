@@ -1,5 +1,7 @@
 import { useLocation, useHistory } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import store from '../redux/store'
+
 import axios from 'axios'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -17,7 +19,10 @@ const TestPage = () => {
   let [state, setState] = useState()
   let [textareaState, setTextareaState] = useState()
   let [responseState, setResponseState] = useState()
-
+  const handleError = (error => {
+    const errormsg = error?.response?.data?.error ?? "connection error"
+    store.dispatch({type: "SET_ALERT", text: errormsg})
+  })
   // Question data is retrieved
   useEffect(() =>{
     if (!externalState) {
@@ -25,21 +30,12 @@ const TestPage = () => {
     }
     axios.get(`${process.env.REACT_APP_HOST}/test/${externalState?.testId}`)
       .then(response => {setState(response?.data)})
-        .catch(error => console.log(error?.response))
+        .catch(error => {handleError(error)})
   }, [externalState, history, setState])
 
   // Keeping track of textarea state
   const handleAreaChange = (event) => {
     setTextareaState(event.target.value)
-  }
-
-  const handleError = (error) => {
-    if (error.response){
-      setResponseState(error.response.data)
-    }
-    else{
-      setResponseState({error: "Failed to connect to origin server"})
-    }
   }
 
   // Execute data is retrieved
@@ -52,15 +48,20 @@ const TestPage = () => {
     axios.post(
       `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/execute`, {query: textareaState}
       ).then(response => {setResponseState(response?.data)})
-        .catch(error => {handleError(error)}
-    )
+        .catch(error => {
+          if (error?.response) {
+            setResponseState(error?.response?.data)
+          }else{
+            handleError(error)
+          }
+        })
   }
 
   const handleSubmit = () => {
     axios.post(
       `${process.env.REACT_APP_HOST}/test/${externalState?.testId}/submit`, {query: textareaState}
       ).then(response => {history.push({pathname: '/finish', data: response.data})})
-        .catch(error => {setResponseState({error: "An error occurred"})}
+        .catch(error => {handleError(error)}
     )
   }
 

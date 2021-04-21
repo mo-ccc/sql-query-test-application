@@ -5,7 +5,7 @@ const initialState = {
 }
 
 const alertReducer = (state = initialState, action) => {
-    if (action.type == SET_NOTIFICATION){
+    if (action.type === "SET_ALERT"){
          return {
             text: action.text
         }
