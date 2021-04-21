@@ -47,8 +47,9 @@ def seed_question():
     with open(os.path.join(directory, 'dumps/questions.json')) as f:
         questions = json.load(f)
         for question in questions:
-            db.session.add(Question(**question))
-            db.session.flush()
+            # will ensure that answer_as_query is syntactically correct
+            validated_data = QuestionSchema().load(question)
+            db.session.add(Question(**validated_data))
             print("added")
         db.session.commit()
     

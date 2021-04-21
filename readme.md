@@ -30,7 +30,7 @@ https://sqltestapp.ml
 ### Api documentation
 https://editor.swagger.io/?url=https://raw.githubusercontent.com/mo-ccc/sql-query-test-application/master/docs/swagger.yml
 
-### Scrumban board
+### Kanban board
 https://trello.com/b/MnSlqP47/sql-query-test-application
 
 ## Original Plan

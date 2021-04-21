@@ -34,7 +34,6 @@ jobs:
           python -m pip install --upgrade pip
           if [[ -f back-end/src/requirements.txt ]]; then pip install -r back-end/src/requirements.txt; fi
           
-          
       - name: run unittest
         timeout-minutes: 3
         run: |

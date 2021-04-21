@@ -10,7 +10,11 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
     
     @validates_schema(skip_on_field_errors=True)
     def answer_as_query_validator(self, data, **kwargs):
-        print(data)
+        binding = db.get_engine(bind="secondary_schema")
+        sess = db.create_scoped_session(options = {'bind': binding})
+        sess.execute("SET search_path TO secondary_schema;")
+        # when query is executed if it raises any errors those will be caught during seeding
+        sess.execute(data["answer_as_query"])
     
     # this massive function takes the answer_as_query
     # and parses all the tables from the query
@@ -27,7 +31,7 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
         sess = db.create_scoped_session(options = {'bind': binding})
 
         with sess.connection().connection.cursor() as curs:
-            curs.execute("""SET search_path TO secondary_schema;""")
+            curs.execute("SET search_path TO secondary_schema;")
             for x in tables:
                 curs.execute(f"""SELECT column_name, data_type 
                 FROM (SELECT * FROM information_schema.columns
