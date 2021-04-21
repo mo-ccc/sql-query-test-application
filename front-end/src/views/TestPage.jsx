@@ -6,10 +6,10 @@ import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
-import TableBase from '../components/TableBase.js'
-import SchemaBase from '../components/SchemaBase.js'
-import FeedBackText from '../components/FeedBackText.js'
-import ModalConfirm from '../components/ModalConfirm.js'
+import TableBase from '../components/TableBase'
+import SchemaBase from '../components/SchemaBase'
+import FeedBackText from '../components/FeedBackText'
+import ModalConfirm from '../components/ModalConfirm'
 
 const TestPage = () => {
   let externalState = useLocation().state

@@ -1,7 +1,7 @@
 import { Switch, Route, Redirect } from 'react-router-dom'
-import LandingPage from './views/LandingPage.js'
-import TestPage from './views/TestPage.js'
-import ThankYouPage from './views/ThankYouPage.js'
+import LandingPage from './views/LandingPage.jsx'
+import TestPage from './views/TestPage.jsx'
+import ThankYouPage from './views/ThankYouPage.jsx'
 
 
 const App = () => {

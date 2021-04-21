@@ -19,7 +19,7 @@ const LandingPage = () => {
     .then(response => {
       history.push({pathname: '/test', state: {testId: response.data.tests[0].id}})
     })
-    .catch(error => {console.log(error); setResponseErrors(error)})
+    .catch(error => {setResponseErrors(error)})
   }
 
   const loginFields = [
